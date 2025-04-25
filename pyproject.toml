@@ -1,0 +1,20 @@
+[project]
+name = "agents-course-gaia-challenge"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+
+dependencies = [
+    "google-genai>=1.12.1",
+    "httpx>=0.28.1",
+    "llama-index-core>=0.12.33.post1",
+    "llama-index-workflow>=1.0.1",
+    "pydantic>=2.11.3",
+    "pydantic-settings>=2.9.1",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+]
