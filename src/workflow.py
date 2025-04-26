@@ -19,6 +19,7 @@ from llama_index.core.workflow import (
     Workflow,
     step,
 )
+from llama_index.core.workflow.retry_policy import ConstantDelayRetryPolicy
 from pydantic import SecretStr
 
 from src.models import Result
@@ -62,6 +63,8 @@ class ExtractAnswerEvent(Event):
 
 
 class QuestionWorkflow(Workflow):
+    DEFAULT_RETRY = ConstantDelayRetryPolicy(delay=10, maximum_attempts=3)
+
     def __init__(
         self,
         *args: Any,
@@ -92,7 +95,7 @@ class QuestionWorkflow(Workflow):
         data_path.mkdir(parents=True, exist_ok=True)
         self.data_path = data_path
 
-    @step
+    @step(retry_policy=DEFAULT_RETRY)
     async def start(
         self,
         context: Context,
@@ -115,7 +118,7 @@ class QuestionWorkflow(Workflow):
         # Check if the question has a file name
         return DownloadFileEvent() if event.question.file_name else LanguageModelEvent()
 
-    @step
+    @step(retry_policy=DEFAULT_RETRY)
     async def download_file(
         self,
         context: Context,
@@ -133,7 +136,7 @@ class QuestionWorkflow(Workflow):
 
         return UploadFileEvent(file_path=file_path)
 
-    @step
+    @step(retry_policy=DEFAULT_RETRY)
     async def upload_file(
         self,
         context: Context,
@@ -168,7 +171,7 @@ class QuestionWorkflow(Workflow):
 
         return LanguageModelEvent()
 
-    @step
+    @step(retry_policy=DEFAULT_RETRY)
     async def call_language_model(
         self,
         context: Context,
@@ -207,7 +210,7 @@ class QuestionWorkflow(Workflow):
         assert response.text, "Response text is empty"
         return ExtractAnswerEvent(text=response.text)
 
-    @step
+    @step(retry_policy=DEFAULT_RETRY)
     async def call_function(
         self,
         context: Context,
@@ -251,7 +254,7 @@ class QuestionWorkflow(Workflow):
         # Return the result
         return LanguageModelEvent()
 
-    @step
+    @step(retry_policy=DEFAULT_RETRY)
     async def extract_answer(
         self,
         context: Context,
