@@ -13,3 +13,8 @@ class Settings(BaseSettings, env_file=".env"):
 
     gemini_api_key: SecretStr
     gemini_model: GEMINI_MODELS = "gemini-2.0-flash"
+
+    huggingface_username: str = "hedderich"
+    huggingface_space: HttpUrl = HttpUrl(
+        "https://huggingface.co/spaces/hedderich/agents-course-gaia-challenge/tree/main"
+    )

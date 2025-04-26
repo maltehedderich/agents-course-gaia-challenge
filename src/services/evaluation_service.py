@@ -4,7 +4,7 @@ from pathlib import Path
 import httpx
 from pydantic import HttpUrl
 
-from src.models import Question
+from src.models import EvaluationResponse, Question, Result
 
 log = logging.getLogger(__name__)
 
@@ -37,3 +37,22 @@ class EvaluationService:
 
         # Save the file to the specified path
         file_path.write_bytes(response.content)
+
+    def submit(
+        self, username: str, agent_code: HttpUrl, results: list[Result]
+    ) -> EvaluationResponse:
+        """
+        Submit the results to the evaluation service.
+        """
+        log.info("Submitting results to the evaluation service")
+        url = str(self.base_url) + "submit"
+        payload = {
+            "username": username,
+            "agent_code": str(agent_code),
+            "answers": [result.get_answer() for result in results],
+        }
+        response = httpx.post(url, json=payload)
+        response.raise_for_status()
+
+        log.info("Results submitted successfully")
+        return EvaluationResponse.model_validate(response.json())
