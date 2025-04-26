@@ -70,7 +70,7 @@ async def wikipedia_search(wikipedia_title: str) -> str:
     if not titles:
         return "No results found."
 
-    output_template = "{title}\n```{content}\n```\n"
+    output_template = "Wikipedia: {title}\n```{content}\n```\n"
 
     # Get the first result
     page = wikipedia.page(titles[0])
