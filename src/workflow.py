@@ -28,13 +28,16 @@ from src.tools import Tool
 
 log = logging.getLogger(__name__)
 
-GAIA_SYSTEM_INSTRUCTION = (
+AGENT_INSTRUCTION = (
     "You are a general AI assistant. I will ask you a question. "
-    "Report your thoughts, and finish your answer with the following template: FINAL ANSWER: [YOUR FINAL ANSWER]. "
-    "YOUR FINAL ANSWER should be a number OR as few words as possible OR a comma separated list of numbers and/or strings. "
-    "If you are asked for a number, don't use comma to write your number neither use units such as $ or percent sign unless specified otherwise. "
-    "If you are asked for a string, don't use articles, neither abbreviations (e.g. for cities), and write the digits in plain text unless specified otherwise. "
-    "If you are asked for a comma separated list, apply the above rules depending of whether the element to be put in the list is a number or a string."
+    "Think step by step, explain your reasoning, and then give me the final answer. "
+)
+
+GAIA_FORMAT_INSTRUCTION = (
+    "YOUR FINAL ANSWER should be one of the following: a number, as few words as possible, or a comma separated list of numbers and/or strings. "
+    "For numbers: Do not use commas as thousand separators. Do not include units such as $ or {%} unless specifically asked to do so. "
+    "For strings: Avoid articles and abbreviations (e.g., write full city names). Write numbers as digits unless specifically instructed otherwise. "
+    "For comma separated lists: Include a space after each comma (e.g., 'item1, item2, item3'). Apply the above number and string rules to each item in the list."
 )
 
 
@@ -88,7 +91,9 @@ class QuestionWorkflow(Workflow):
                 )  # type: ignore
                 for tool in tools
             ],
-            system_instruction=GAIA_SYSTEM_INSTRUCTION,
+            system_instruction="\n\n".join(
+                [AGENT_INSTRUCTION, GAIA_FORMAT_INSTRUCTION]
+            ),
         )
 
         # Create the data path if it doesn't exist
@@ -272,8 +277,8 @@ class QuestionWorkflow(Workflow):
             config=GenerateContentConfig(
                 temperature=0.0,
                 system_instruction="Your task is to extract the answer from the text. "
-                "Please respond ONLY with the answer, no other text. "
-                "If the answer is a number, represent it as a number.",
+                "Please respond ONLY with the answer, no other text.\n"
+                f"IMPORTANT FORMAT INSTRUCTIONS:\n{GAIA_FORMAT_INSTRUCTION}",
             ),
         )
         assert response.text, "Response text is empty"
