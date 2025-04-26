@@ -268,7 +268,7 @@ class QuestionWorkflow(Workflow):
 
         response = await self.gemini_client.aio.models.generate_content(
             model=self.model,
-            contents=event.text,
+            contents=f"QUESTION: {question.question}\n\nSOLUTION TEXT: {event.text}",
             config=GenerateContentConfig(
                 temperature=0.0,
                 system_instruction="Your task is to extract the answer from the text. "
