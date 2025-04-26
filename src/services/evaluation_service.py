@@ -1,9 +1,12 @@
+import logging
 from pathlib import Path
 
 import httpx
 from pydantic import HttpUrl
 
 from src.models import Question
+
+log = logging.getLogger(__name__)
 
 
 class EvaluationService:
@@ -14,6 +17,7 @@ class EvaluationService:
         """
         Get the questions from the evaluation service.
         """
+        log.info("Fetching questions from the evaluation service")
         url = str(self.base_url) + "questions"
         response = httpx.get(url)
         response.raise_for_status()
@@ -25,6 +29,7 @@ class EvaluationService:
         Get the file from the evaluation service.
         """
         assert question.file_name, "Question does not have a file attached"
+        log.info(f"Downloading file {question.file_name} for task {question.task_id}")
 
         url = str(self.base_url) + "files/" + question.task_id
         response = httpx.get(url)

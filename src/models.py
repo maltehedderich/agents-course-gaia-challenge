@@ -8,3 +8,8 @@ class Question(BaseModel):
     level: str = Field(..., alias="Level")
 
     model_config = ConfigDict(populate_by_name=True, extra="ignore")
+
+
+class Result(BaseModel):
+    question: Question
+    answer: str

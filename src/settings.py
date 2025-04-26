@@ -1,5 +1,11 @@
+from typing import Literal
+
 from pydantic import HttpUrl, SecretStr
 from pydantic_settings import BaseSettings
+
+GEMINI_MODELS = Literal[
+    "gemini-2.0-flash", "gemini-2.5-flash-preview-04-17", "gemini-2.5-pro-preview-03-25"
+]
 
 
 class Settings(BaseSettings, env_file=".env"):
@@ -8,4 +14,4 @@ class Settings(BaseSettings, env_file=".env"):
     )
 
     gemini_api_key: SecretStr
-    gemini_model: str = "gemini-2.5-pro-preview-03-25"
+    gemini_model: GEMINI_MODELS = "gemini-2.0-flash"
