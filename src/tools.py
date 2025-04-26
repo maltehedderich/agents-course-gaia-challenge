@@ -1,7 +1,11 @@
 import logging
+import re
+from io import StringIO
 from typing import Callable
 
+import httpx
 import pandas as pd  # type: ignore
+from bs4 import BeautifulSoup
 from google import genai
 from google.genai.types import (
     Content,
@@ -70,18 +74,40 @@ async def wikipedia_search(wikipedia_title: str) -> str:
     if not titles:
         return "No results found."
 
-    output_template = "Wikipedia: {title}\n```{content}\n```\n"
-
     # Get the first result
     page = wikipedia.page(titles[0])
-    tables = pd.read_html(page.url)
-    content = (
-        page.content
-        + "\n\nTables:\n"
-        + "\n".join(table.to_markdown() for table in tables)
-    )
+    response = httpx.get(page.url)
+    response.raise_for_status()
 
-    return output_template.format(title=page.title, content=content)
+    soup = BeautifulSoup(response.content, "html.parser")
+
+    # Filter for bodyContent to avoid unnecessary processing
+    body_content = soup.find(id="bodyContent")
+    assert body_content, "No body content found in the page"
+
+    # Process tables in the content
+    tables = body_content.find_all("table")  # type: ignore
+    for table in tables:
+        try:
+            # Create a temporary HTML string with just this table
+            table_html = str(table)
+            # Use pandas to read the table and convert to markdown
+            dfs = pd.read_html(StringIO(table_html), flavor="bs4")
+            if dfs:
+                markdown_table = dfs[0].to_markdown()
+                # Create a new tag to replace the table
+                new_tag = soup.new_tag("div")
+                new_tag.string = f"\n\n{markdown_table}\n\n"
+                table.replace_with(new_tag)
+        except Exception as e:
+            log.warning(f"Failed to convert table to markdown: {str(e)}")
+
+    # Clean the text while preserving paragraph structure
+    cleaned_text = re.sub(r"\n{3,}", "\n\n", body_content.text)
+
+    # Format the output using the template
+    output_template = "Wikipedia: {title}\n```{content}```\n"
+    return output_template.format(title=page.title, content=cleaned_text)
 
 
 # Add YouTube Tool
@@ -193,6 +219,42 @@ async def decode_text(text: str) -> str:
     return response.text
 
 
+async def extract_answer(question: str, final_answer: str) -> str:
+    """
+    Extract the answer from the final answer string. This function is used to extract the answer from the final answer
+    string returned by the model. The final answer string may contain additional information, such as the source of
+    the answer or other context.
+
+    Parameters
+    ----------
+    question : str
+        The question that was asked.
+    final_answer : str
+        The final answer string returned by the model.
+
+    Returns
+    -------
+    str
+        The extracted answer.
+    """
+    log.info(f"Extracting answer for question: {question}")
+    # Extract the answer from the final answer string
+    client = genai.Client(api_key=settings.gemini_api_key.get_secret_value())
+    response = await client.aio.models.generate_content(
+        model=settings.gemini_model,
+        contents=f"QUESTION: {question}\n\nSOLUTION TEXT: {final_answer}",
+        config=GenerateContentConfig(
+            temperature=0.0,
+            system_instruction="Your task is to extract the answer from the text. "
+            "Please respond ONLY with the answer, no other text. "
+            "If the answer is a number, represent it as a number."
+            "If the answer is a comma seperated list, include a space after each comma.",
+        ),
+    )
+    assert response.text, "Response text is empty"
+    return response.text
+
+
 def get_tools() -> list[Tool]:
     """
     Get the list of tools.
@@ -202,4 +264,5 @@ def get_tools() -> list[Tool]:
         Tool.from_function(youtube_search),
         Tool.from_function(google_search),
         Tool.from_function(decode_text),
+        Tool.from_function(extract_answer),
     ]
