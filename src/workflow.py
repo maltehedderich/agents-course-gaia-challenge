@@ -27,6 +27,15 @@ from src.tools import Tool
 
 log = logging.getLogger(__name__)
 
+GAIA_SYSTEM_INSTRUCTION = (
+    "You are a general AI assistant. I will ask you a question. "
+    "Report your thoughts, and finish your answer with the following template: FINAL ANSWER: [YOUR FINAL ANSWER]. "
+    "YOUR FINAL ANSWER should be a number OR as few words as possible OR a comma separated list of numbers and/or strings. "
+    "If you are asked for a number, don't use comma to write your number neither use units such as $ or percent sign unless specified otherwise. "
+    "If you are asked for a string, don't use articles, neither abbreviations (e.g. for cities), and write the digits in plain text unless specified otherwise. "
+    "If you are asked for a comma separated list, apply the above rules depending of whether the element to be put in the list is a number or a string."
+)
+
 
 class QuestionStartEvent(StartEvent):
     question: Question
@@ -49,7 +58,7 @@ class FunctionCallEvent(Event):
 
 
 class ExtractAnswerEvent(Event):
-    pass
+    text: str
 
 
 class QuestionWorkflow(Workflow):
@@ -76,6 +85,7 @@ class QuestionWorkflow(Workflow):
                 )  # type: ignore
                 for tool in tools
             ],
+            system_instruction=GAIA_SYSTEM_INSTRUCTION,
         )
 
         # Create the data path if it doesn't exist
@@ -194,7 +204,8 @@ class QuestionWorkflow(Workflow):
         await context.set("contents", contents)
 
         # If no function calls, extract the answer directly
-        return ExtractAnswerEvent()
+        assert response.text, "Response text is empty"
+        return ExtractAnswerEvent(text=response.text)
 
     @step
     async def call_function(
@@ -244,40 +255,23 @@ class QuestionWorkflow(Workflow):
     async def extract_answer(
         self,
         context: Context,
-        _: ExtractAnswerEvent,
+        event: ExtractAnswerEvent,
     ) -> StopEvent:
         """
         Extract the answer from the language model response.
         """
         question = await context.get("question")
-        contents = await context.get("contents")
         assert isinstance(question, Question), "`question` not found in context"
-        assert isinstance(contents, list), "`contents` not found in context"
 
-        contents.append(
-            Content(
-                role="user",
-                parts=[
-                    Part(
-                        text=(
-                            "Extract the answer to the initial question from the content above. "
-                            "Answer purely based on the content above, without any additional information.\n"
-                            "IMPORTANT: ONLY RETURN THE ANSWER, WITHOUT ANY ADDITIONAL TEXT.\n"
-                            f"\n\nQuestion: {question.question}\n\n"
-                            "Answer: "
-                        )
-                    )
-                ],
-            )
-        )
-
-        # Get the last content
         response = await self.gemini_client.aio.models.generate_content(
             model=self.model,
-            contents=contents,  # type: ignore
-            config=GenerateContentConfig(temperature=0.0),
+            contents=event.text,
+            config=GenerateContentConfig(
+                temperature=0.0,
+                system_instruction="Your task is to extract the answer from the text. "
+                "Please respond ONLY with the answer, no other text. "
+                "If the answer is a number, represent it as a number.",
+            ),
         )
-
-        # Return the result
         assert response.text, "Response text is empty"
         return StopEvent(result=Result(question=question, answer=response.text.strip()))
