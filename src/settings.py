@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Literal
 
 from pydantic import HttpUrl, SecretStr
@@ -18,3 +19,9 @@ class Settings(BaseSettings, env_file=".env"):
     huggingface_space: HttpUrl = HttpUrl(
         "https://huggingface.co/spaces/hedderich/agents-course-gaia-challenge/tree/main"
     )
+
+    @property
+    def result_path(self) -> Path:
+        path = Path("results") / self.gemini_model
+        path.mkdir(parents=True, exist_ok=True)
+        return path

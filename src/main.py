@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import sys
-from pathlib import Path
 from typing import Any, get_args
 
 from src.models import EvaluationResponse, Result
@@ -19,8 +18,6 @@ log = logging.getLogger(__name__)
 ALLOWED_COMMANDS = ["generate_answers", "submit_answers"]
 
 questions = evaluation_service.get_questions()
-result_path = Path("results") / settings.gemini_model
-result_path.mkdir(parents=True, exist_ok=True)
 
 
 async def generate_answers() -> None:
@@ -33,7 +30,7 @@ async def generate_answers() -> None:
     )
 
     for question in questions:
-        result_file_path = result_path / f"{question.task_id}.json"
+        result_file_path = settings.result_path / f"{question.task_id}.json"
         if result_file_path.exists():
             log.info(
                 f"Result file already exists for task {question.task_id}. Skipping."
@@ -51,7 +48,7 @@ async def generate_answers() -> None:
 
 
 async def submit_answers() -> None:
-    answer_files = list(result_path.glob("*.json"))
+    answer_files = list(settings.result_path.glob("*.json"))
     # Check if all answer files are generated
     if len(answer_files) < len(questions):
         log.warning(
