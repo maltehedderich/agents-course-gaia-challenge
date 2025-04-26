@@ -47,6 +47,10 @@ async def generate_answers() -> None:
         result_file_path.write_text(result.model_dump_json(indent=4))
 
 
+async def upload_results() -> None:
+    pass
+
+
 async def main(command: str, **kwargs: Any) -> None:
     if command not in ALLOWED_COMMANDS:
         print(
