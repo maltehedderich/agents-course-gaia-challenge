@@ -2,11 +2,27 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Generate Answers: Gemini Flash Lite 2.0",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "src.main",
+      "args": ["generate_answers", "--model=gemini-2.0-flash-lite"],
+      "justMyCode": true
+    },
+    {
       "name": "Generate Answers: Gemini Flash 2.0 ",
       "type": "debugpy",
       "request": "launch",
       "module": "src.main",
       "args": ["generate_answers", "--model=gemini-2.0-flash"],
+      "justMyCode": true
+    },
+    {
+      "name": "Generate Answers: Gemini Flash 2.5 Preview",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "src.main",
+      "args": ["generate_answers", "--model=gemini-2.5-flash-preview-04-17"],
       "justMyCode": true
     },
     {
@@ -18,11 +34,27 @@
       "justMyCode": true
     },
     {
+      "name": "Submit Answers: Gemini Flash Lite 2.0",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "src.main",
+      "args": ["submit_answers", "--model=gemini-2.0-flash-lite"],
+      "justMyCode": true
+    },
+    {
       "name": "Submit Answers: Gemini Flash 2.0",
       "type": "debugpy",
       "request": "launch",
       "module": "src.main",
       "args": ["submit_answers", "--model=gemini-2.0-flash"],
+      "justMyCode": true
+    },
+    {
+      "name": "Submit Answers: Gemini Flash 2.5 Preview",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "src.main",
+      "args": ["submit_answers", "--model=gemini-2.5-flash-preview-04-17"],
       "justMyCode": true
     },
     {
