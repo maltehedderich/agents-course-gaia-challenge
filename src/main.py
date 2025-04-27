@@ -3,7 +3,7 @@ import logging
 import sys
 from typing import Any, get_args
 
-from llama_index.utils.workflow import draw_all_possible_flows
+from llama_index.utils.workflow import draw_all_possible_flows  # type: ignore
 
 from src.models import EvaluationResponse, Result
 from src.services import EvaluationService
