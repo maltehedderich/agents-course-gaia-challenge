@@ -5,7 +5,6 @@ from typing import Callable
 
 import httpx
 import pandas as pd  # type: ignore
-import wikipedia  # type: ignore
 from bs4 import BeautifulSoup
 from google import genai
 from google.genai.types import (
@@ -17,6 +16,7 @@ from google.genai.types import (
     Part,
 )
 from google.genai.types import Tool as GenaiTool
+from mediawikiapi import MediaWikiAPI  # type: ignore
 from pydantic import BaseModel
 
 from src.settings import Settings
@@ -69,6 +69,7 @@ async def wikipedia_search(wikipedia_title: str) -> str:
         Wikipedia content of the top result.
     """
     log.info(f"Searching Wikipedia for: {wikipedia_title}")
+    wikipedia = MediaWikiAPI()
     titles = wikipedia.search(wikipedia_title, results=1)
     if not titles:
         return "No results found."
