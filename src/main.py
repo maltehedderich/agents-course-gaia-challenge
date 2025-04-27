@@ -3,6 +3,8 @@ import logging
 import sys
 from typing import Any, get_args
 
+from llama_index.utils.workflow import draw_all_possible_flows
+
 from src.models import EvaluationResponse, Result
 from src.services import EvaluationService
 from src.settings import GEMINI_MODELS, Settings
@@ -15,7 +17,7 @@ evaluation_service = EvaluationService(settings.evaluation_api_base_url)
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
-ALLOWED_COMMANDS = ["generate_answers", "submit_answers"]
+ALLOWED_COMMANDS = ["generate_answers", "submit_answers", "draw_workflow"]
 
 questions = evaluation_service.get_questions()
 
@@ -73,6 +75,10 @@ async def submit_answers() -> None:
     )
 
 
+async def draw_workflow() -> None:
+    draw_all_possible_flows(QuestionWorkflow, "workflow.html")
+
+
 async def main(command: str, **kwargs: Any) -> None:
     # Use the provided model if specified
     if "--model" in kwargs:
@@ -90,6 +96,8 @@ async def main(command: str, **kwargs: Any) -> None:
         await generate_answers()
     elif command == "submit_answers":
         await submit_answers()
+    elif command == "draw_workflow":
+        await draw_workflow()
     else:
         raise ValueError(
             f"Command {command} is not implemented. Please use one of the following commands: [{', '.join(ALLOWED_COMMANDS)}]"

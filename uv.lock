@@ -16,6 +16,7 @@ dependencies = [
     { name = "html5lib" },
     { name = "httpx" },
     { name = "llama-index-core" },
+    { name = "llama-index-utils-workflow" },
     { name = "llama-index-workflow" },
     { name = "lxml" },
     { name = "mediawikiapi" },
@@ -39,6 +40,7 @@ requires-dist = [
     { name = "html5lib", specifier = ">=1.1" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "llama-index-core", specifier = ">=0.12.33.post1" },
+    { name = "llama-index-utils-workflow", specifier = ">=0.3.1" },
     { name = "llama-index-workflow", specifier = ">=1.0.1" },
     { name = "lxml", specifier = ">=5.4.0" },
     { name = "mediawikiapi", specifier = ">=1.3" },
@@ -681,6 +683,15 @@ wheels = [
 ]
 
 [[package]]
+name = "jsonpickle"
+version = "4.0.5"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d6/33/4bda317ab294722fcdfff8f63aab74af9fda3675a4652d984a101aa7587e/jsonpickle-4.0.5.tar.gz", hash = "sha256:f299818b39367c361b3f26bdba827d4249ab5d383cd93144d0f94b5417aacb35", size = 315661 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/dc/1b/0e79cf115e0f54f1e8f56effb6ffd2ef8f92e9c324d692ede660067f1bfe/jsonpickle-4.0.5-py3-none-any.whl", hash = "sha256:b4ac7d0a75ddcdfd93445737f1d36ff28768690d43e54bf5d0ddb1d915e580df", size = 46382 },
+]
+
+[[package]]
 name = "jupyter-client"
 version = "8.6.3"
 source = { registry = "https://pypi.org/simple" }
@@ -742,6 +753,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a9/51/e99358e80b0d80777c84081159d351f51feaa6c7d7054486bbbb49f6c9c0/llama_index_core-0.12.33.post1.tar.gz", hash = "sha256:d257f6f594dfd9cf6435af02761a3d21f1427df5347f0e5e9fffe4024db6a724", size = 7282200 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/87/01/6fcf557a72ad25734327515db506744f8f8ba95846a0f7e055c8fa95a54d/llama_index_core-0.12.33.post1-py3-none-any.whl", hash = "sha256:2c4a316a1ae9ec86c817d44961d1058691632acb3a7021e6af56fcfb8735fd3d", size = 7650733 },
+]
+
+[[package]]
+name = "llama-index-utils-workflow"
+version = "0.3.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "llama-index-core" },
+    { name = "pyvis" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/70/69/eea229ca64d08c47f0235fafb0a17149709793fbaca0e908c29d1a82d44b/llama_index_utils_workflow-0.3.1.tar.gz", hash = "sha256:0afdcdaaae2e243ae992bffdfbb3ee9c95071366b0e047333c49e97747259290", size = 3232 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/de/d9/c2c9816a181821bb734acfafd0de7659403276ba0a8eff5b434532ab9e2b/llama_index_utils_workflow-0.3.1-py3-none-any.whl", hash = "sha256:352f8858cdeef2dfa4301bb9ca7b0d24f83debe771ddc86300bd464d3521a815", size = 3733 },
 ]
 
 [[package]]
@@ -1338,6 +1362,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f8/bf/abbd3cdfb8fbc7fb3d4d38d320f2441b1e7cbe29be4f23797b4a2b5d8aac/pytz-2025.2.tar.gz", hash = "sha256:360b9e3dbb49a209c21ad61809c7fb453643e048b38924c765813546746e81c3", size = 320884 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/81/c4/34e93fe5f5429d7570ec1fa436f1986fb1f00c3e0f43a589fe2bbcd22c3f/pytz-2025.2-py2.py3-none-any.whl", hash = "sha256:5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00", size = 509225 },
+]
+
+[[package]]
+name = "pyvis"
+version = "0.3.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "ipython" },
+    { name = "jinja2" },
+    { name = "jsonpickle" },
+    { name = "networkx" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ab/4b/e37e4e5d5ee1179694917b445768bdbfb084f5a59ecd38089d3413d4c70f/pyvis-0.3.2-py3-none-any.whl", hash = "sha256:5720c4ca8161dc5d9ab352015723abb7a8bb8fb443edeb07f7a322db34a97555", size = 756038 },
 ]
 
 [[package]]
